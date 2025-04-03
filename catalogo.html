@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catalogo Libri - Biblioteca Pubblica</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    input {
+      width: 80%;
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+    .book {
+      display: flex;
+      gap: 20px;
+      padding: 15px 0;
+      border-bottom: 1px solid #ccc;
+    }
+    .book img {
+      width: 100px;
+      height: auto;
+    }
+    .book-details {
+      flex: 1;
+    }
+    .title {
+      font-weight: bold;
+      font-size: 18px;
+    }
+    .author {
+      color: #666;
+      font-size: 14px;
+    }
+    .description {
+      margin-top: 10px;
+      font-size: 14px;
+    }
+    .tags {
+      margin-top: 8px;
+      font-size: 13px;
+      color: #0073aa;
+    }
+  </style>
+</head>
+<body>
+  <h1>📚 Catalogo della Biblioteca</h1>
+  <input type="text" id="search" placeholder="Cerca per titolo, autore o editore...">
+  <div id="catalog"></div>
+
+  <script>
+    const catalogo = JSON.parse(localStorage.getItem('libri_collezione')) || [];
+
+    const catalogDiv = document.getElementById("catalog");
+    const searchInput = document.getElementById("search");
+
+    function renderCatalog(filter = "") {
+      catalogDiv.innerHTML = "";
+      const filtro = filter.toLowerCase();
+      const risultati = catalogo.filter(book =>
+        book.title.toLowerCase().includes(filtro) ||
+        book.authors.toLowerCase().includes(filtro) ||
+        book.publisher.toLowerCase().includes(filtro)
+      );
+
+      if (risultati.length === 0) {
+        catalogDiv.innerHTML = "<p>Nessun libro trovato.</p>";
+        return;
+      }
+
+      risultati.forEach(book => {
+        const div = document.createElement("div");
+        div.classList.add("book");
+        div.innerHTML = `
+          <img src="${book.cover}" alt="Copertina">
+          <div class="book-details">
+            <div class="title">${book.title}</div>
+            <div class="author">di ${book.authors}</div>
+            <div class="description">${book.description.slice(0, 250)}...</div>
+            <div class="tags">Tag: ${book.tags.join(", ")}</div>
+          </div>
+        `;
+        catalogDiv.appendChild(div);
+      });
+    }
+
+    searchInput.addEventListener("input", () => renderCatalog(searchInput.value));
+
+    renderCatalog();
+  </script>
+</body>
+</html>
